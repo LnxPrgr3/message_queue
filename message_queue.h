@@ -63,6 +63,10 @@ struct message_queue {
 	} queue __attribute__((aligned(CACHE_LINE_SIZE)));
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief Initialize a message queue structure
  *
@@ -158,5 +162,9 @@ void *message_queue_read(struct message_queue *queue);
  * \param queue pointer to the message queue to destroy
  */
 void message_queue_destroy(struct message_queue *queue);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
