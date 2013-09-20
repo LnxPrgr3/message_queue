@@ -67,6 +67,7 @@ static inline int max(int x, int y) {
 }
 
 int message_queue_init(struct message_queue *queue, int message_size, int max_depth) {
+    int i;
 	char sem_name[128];
 	queue->message_size = pad_size(message_size);
 	queue->max_depth = round_to_pow2(max_depth);
@@ -76,7 +77,7 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 	queue->freelist = malloc(sizeof(void *) * queue->max_depth);
 	if(!queue->freelist)
 		goto error_after_memory;
-	for(int i=0;i<queue->max_depth;++i) {
+	for(i=0;i<queue->max_depth;++i) {
 		queue->freelist[i] = queue->memory + (sizeof(void *) * i);
 	}
 	snprintf(sem_name, 128, "%d_%p", getpid(), &queue->allocator);
@@ -94,7 +95,7 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 	queue->queue_data = malloc(sizeof(void *) * queue->max_depth);
 	if(!queue->queue_data)
 		goto error_after_alloc_sem;
-	for(int i=0;i<queue->max_depth;++i) {
+	for(i=0;i<queue->max_depth;++i) {
 		queue->queue_data[i] = NULL;
 	}
 	queue->queue.blocked_readers = 0;
