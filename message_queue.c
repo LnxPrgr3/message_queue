@@ -45,7 +45,7 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 	if(!queue->allocator.freelist)
 		goto error_after_memory;
 	for(int i=0;i<max_depth;++i) {
-		queue->allocator.freelist[i] = queue->memory + (sizeof(void *) * i);
+		queue->allocator.freelist[i] = queue->memory + (queue->message_size * i);
 	}
 	for(int i=max_depth;i<queue->allocator.freelist_size;++i) {
 		queue->allocator.freelist[i] = NULL;
