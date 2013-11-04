@@ -78,7 +78,7 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 	if(!queue->freelist)
 		goto error_after_memory;
 	for(i=0;i<queue->max_depth;++i) {
-		queue->freelist[i] = queue->memory + (sizeof(void *) * i);
+		queue->freelist[i] = queue->memory + (queue->message_size * i);
 	}
 	snprintf(sem_name, 128, "%d_%p", getpid(), &queue->allocator);
 	sem_name[127] = '\0';
