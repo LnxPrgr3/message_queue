@@ -71,7 +71,7 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 	char sem_name[128];
 	queue->message_size = pad_size(message_size);
 	queue->max_depth = round_to_pow2(max_depth);
-	queue->memory = malloc(queue->message_size * max_depth);
+	queue->memory = malloc(queue->message_size * queue->max_depth);
 	if(!queue->memory)
 		goto error;
 	queue->freelist = malloc(sizeof(void *) * queue->max_depth);
