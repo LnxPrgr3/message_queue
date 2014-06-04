@@ -48,14 +48,14 @@ struct message_queue {
 	void **freelist;
 	void **queue_data;
 	struct {
-		sem_t *sem;
+		sem_t sem;
 		unsigned int blocked_readers;
 		int free_blocks;
 		unsigned int allocpos __attribute__((aligned(CACHE_LINE_SIZE)));
 		unsigned int freepos __attribute__((aligned(CACHE_LINE_SIZE)));
 	} allocator __attribute__((aligned(CACHE_LINE_SIZE)));
 	struct {
-		sem_t *sem;
+		sem_t sem;
 		unsigned int blocked_readers;
 		int entries;
 		unsigned int readpos __attribute__((aligned(CACHE_LINE_SIZE)));
