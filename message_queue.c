@@ -82,20 +82,19 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 	}
 	snprintf(sem_name, 128, "%d_%p", getpid(), &queue->allocator);
 	sem_name[127] = '\0';
-	do {
-		queue->allocator.sem = sem_open(sem_name, O_CREAT | O_EXCL, 0600, 0);
-	} while(queue->allocator.sem == SEM_FAILED && errno == EINTR);
-	if(queue->allocator.sem == SEM_FAILED) {
-		while (-1 == sem_init(&(queue->allocator.unnamed_sem), 0, 0)) {
-			if (errno == EINTR) {
-				continue;
-			} else {
+	queue->allocator.sem = &queue->allocator.unnamed_sem;
+	while (-1 == sem_init(&(queue->allocator.unnamed_sem), 0, 0)) {
+		if (errno == EINTR) {
+			continue;
+		} else {
+			do {
+				queue->allocator.sem = sem_open(sem_name, O_CREAT | O_EXCL, 0600, 0);
+			} while(queue->allocator.sem == SEM_FAILED && errno == EINTR);
+			if(queue->allocator.sem == SEM_FAILED)
 				goto error_after_freelist;
-			}
+			sem_unlink(sem_name);
+			break;
 		}
-		queue->allocator.sem = &queue->allocator.unnamed_sem;
-	} else {
-		sem_unlink(sem_name);
 	}
 	queue->allocator.blocked_readers = 0;
 	queue->allocator.free_blocks = queue->max_depth;
@@ -110,20 +109,19 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 	queue->queue.blocked_readers = 0;
 	snprintf(sem_name, 128, "%d_%p", getpid(), queue);
 	sem_name[127] = '\0';
-	do {
-		queue->queue.sem = sem_open(sem_name, O_CREAT | O_EXCL, 0600, 0);
-	} while(queue->queue.sem == SEM_FAILED && errno == EINTR);
-	if(queue->queue.sem == SEM_FAILED) {
-		while (-1 == sem_init(&(queue->queue.unnamed_sem), 0, 0)) {
-			if (errno == EINTR) {
-				continue;
-			} else {
+	queue->queue.sem = &queue->queue.unnamed_sem;
+	while (-1 == sem_init(&(queue->queue.unnamed_sem), 0, 0)) {
+		if (errno == EINTR) {
+			continue;
+		} else {
+			do {
+				queue->queue.sem = sem_open(sem_name, O_CREAT | O_EXCL, 0600, 0);
+			} while(queue->queue.sem == SEM_FAILED && errno == EINTR);
+			if(queue->queue.sem == SEM_FAILED)
 				goto error_after_queue;
-			}
+			sem_unlink(sem_name);
+			break;
 		}
-		queue->queue.sem = &queue->queue.unnamed_sem;
-	} else {
-		sem_unlink(sem_name);
 	}
 	queue->queue.entries = 0;
 	queue->queue.readpos = 0;
