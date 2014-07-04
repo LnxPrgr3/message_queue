@@ -67,7 +67,7 @@ static inline int max(int x, int y) {
 }
 
 int message_queue_init(struct message_queue *queue, int message_size, int max_depth) {
-    int i;
+	int i;
 	char sem_name[128];
 	queue->message_size = pad_size(message_size);
 	queue->max_depth = round_to_pow2(max_depth);
@@ -86,15 +86,15 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 		queue->allocator.sem = sem_open(sem_name, O_CREAT | O_EXCL, 0600, 0);
 	} while(queue->allocator.sem == SEM_FAILED && errno == EINTR);
 	if(queue->allocator.sem == SEM_FAILED) {
-        while (-1 == sem_init(&(queue->allocator.unnamed_sem), 0, 0)) {
-            if (errno == EINTR) {
-                continue;
-            } else {
-                goto error_after_freelist;
-            }
-        }
+		while (-1 == sem_init(&(queue->allocator.unnamed_sem), 0, 0)) {
+			if (errno == EINTR) {
+				continue;
+			} else {
+				goto error_after_freelist;
+			}
+		}
 		queue->allocator.sem = &queue->allocator.unnamed_sem;
-    } else {
+	} else {
 		sem_unlink(sem_name);
 	}
 	queue->allocator.blocked_readers = 0;
@@ -114,15 +114,15 @@ int message_queue_init(struct message_queue *queue, int message_size, int max_de
 		queue->queue.sem = sem_open(sem_name, O_CREAT | O_EXCL, 0600, 0);
 	} while(queue->queue.sem == SEM_FAILED && errno == EINTR);
 	if(queue->queue.sem == SEM_FAILED) {
-        while (-1 == sem_init(&(queue->queue.unnamed_sem), 0, 0)) {
-            if (errno == EINTR) {
-                continue;
-            } else {
-                goto error_after_queue;
-            }
-        }
+		while (-1 == sem_init(&(queue->queue.unnamed_sem), 0, 0)) {
+			if (errno == EINTR) {
+				continue;
+			} else {
+				goto error_after_queue;
+			}
+		}
 		queue->queue.sem = &queue->queue.unnamed_sem;
-    } else {
+	} else {
 		sem_unlink(sem_name);
 	}
 	queue->queue.entries = 0;
@@ -188,7 +188,7 @@ void message_queue_message_free(struct message_queue *queue, void *message) {
 	if(queue->allocator.blocked_readers) {
 		__sync_fetch_and_add(&queue->allocator.blocked_readers, -1);
 		sem_post(queue->allocator.sem);
-    }
+	}
 }
 
 void message_queue_write(struct message_queue *queue, void *message) {
@@ -203,7 +203,7 @@ void message_queue_write(struct message_queue *queue, void *message) {
 	if(queue->queue.blocked_readers) {
 		__sync_fetch_and_add(&queue->queue.blocked_readers, -1);
 		sem_post(queue->queue.sem);
-    }
+	}
 }
 
 void *message_queue_tryread(struct message_queue *queue) {
@@ -248,6 +248,6 @@ void message_queue_destroy(struct message_queue *queue) {
 	} else {
 		sem_close(queue->allocator.sem);
 	}
-    free(queue->freelist);
+	free(queue->freelist);
 	free(queue->memory);
 }
